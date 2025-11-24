@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
 
 public class GestorDatos {
 
@@ -83,7 +83,7 @@ public class GestorDatos {
             inputStream.close();
 
         } catch(Exception e) {
-            System.out.println("❌ Error al cargar clientes: " + e.getMessage());
+            System.out.println("Error al cargar clientes: " + e.getMessage());
         }
     }
 
@@ -118,8 +118,7 @@ public class GestorDatos {
             inputStream.close();
 
         } catch(Exception e) {
-            System.out.println("❌ Error al cargar trabajadores: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error al cargar trabajadores: " + e.getMessage());
         }
     }
 
@@ -155,8 +154,9 @@ public class GestorDatos {
         listaT.add(trabajador);
     }
 
-    //Metodos para buscar  por criterio
 
+
+    //Metodos para buscar  por criterio
 
     public List<Proveedor> buscarCentro(String centro) {
         List<Proveedor> resultadoCentro = new ArrayList<>();
@@ -198,62 +198,38 @@ public class GestorDatos {
 
 
     public List<Trabajador> buscarRut(String rut) {
+        // Validar formato antes de buscar
+        validarFormatoRUT(rut);
+
         List<Trabajador> resultadoRut = new ArrayList<>();
 
-        // Validar formato básico del RUT
-        if (rut == null || rut.trim().isEmpty()) {
-            System.out.println("El RUT no puede estar vacío");
-            return resultadoRut;
-        }
-
-        for (Trabajador trabajador : listaT) {
-            if (trabajador.getRut().equalsIgnoreCase(rut.trim())) {
+        for(Trabajador trabajador : listaT) {
+            if(trabajador.getRut().equalsIgnoreCase(rut)) {
                 resultadoRut.add(trabajador);
             }
+        }
+
+        if (resultadoRut.isEmpty()) {
+            System.out.println("No se encontraron trabajadores con el rut: " + rut);
         }
 
         return resultadoRut;
     }
 
 
-    public void procesoBusquedaTrabajador() {
-        Scanner sc = new Scanner(System.in);
 
-        System.out.print("Ingrese RUT a buscar: ");
-        String rutBuscado = sc.nextLine().trim();
-
-        List<Trabajador> resultados = buscarRut(rutBuscado);
-
-        if (resultados.isEmpty()) {
-            System.out.println("No se encontraron trabajadores con el RUT: " + rutBuscado);
-
-            char confirma;
-            do {
-                System.out.print("¿Desea intentar con otro RUT? (S/N): ");
-                confirma = sc.next().toUpperCase().charAt(0);
-                sc.nextLine(); // Limpiar buffer
-
-                if (confirma == 'S' || confirma != 's') {
-                    // Lógica para nueva búsqueda
-                    System.out.print("Ingrese nuevo RUT: ");
-                    rutBuscado = sc.nextLine().trim();
-                    resultados = buscarRut(rutBuscado);
-
-                    if (!resultados.isEmpty()) {
-                        System.out.println("RUT encontrado - " + resultados.size() + " trabajador(es):");
-                        for (Trabajador t : resultados) {
-                            System.out.println("- " + t.getNombre() + " | RUT: " + t.getRut());
-                        }
-                    }
-                } else if (confirma == 'N' && confirma != 'n') {
-                    System.out.println("Búsqueda finalizada.");
-                    break;
-                } else {
-                    System.out.println("Opción no válida. Use S o N.");
-                }
-            } while (confirma == 'S' || confirma == 's');
+    // Metodo separado para validación de RUT
+    private void validarFormatoRUT(String rut) {
+        if (rut == null || rut.trim().isEmpty()) {
+            throw new IllegalArgumentException("El RUT no puede estar vacío");
         }
 
+        // Expresión regular mejorada para RUT chileno
+        if (!rut.matches("^[0-9]{7,8}-[0-9kK]{1}$")) {
+            throw new IllegalArgumentException(
+                    "Formato de RUT inválido. Debe ser: 12345678-9 (7 u 8 dígitos + guión + dígito verificador)"
+            );
+        }
     }
 
 
@@ -266,6 +242,8 @@ public class GestorDatos {
             proveedor.procesarInformacionFicha();
             System.out.println("──────────────────────────────────");
         }
+
+        System.out.println("Total Proveedores : " +  listaC.size());
     }
 
     public void listarClientes(){
@@ -274,6 +252,8 @@ public class GestorDatos {
             clientes.procesarInformacionFicha();
             System.out.println("──────────────────────────────────");
         }
+
+        System.out.println("Total Clientes : " +  listaC.size());
     }
 
     public void listarTrabajadores(){
@@ -281,7 +261,10 @@ public class GestorDatos {
             System.out.println("──────────────────────────────────");
             trabajador.procesarInformacionFicha();
             System.out.println("──────────────────────────────────");
+
         }
+
+        System.out.println("\nTotal trabajadores : "+ listaT.size());
     }
 
 

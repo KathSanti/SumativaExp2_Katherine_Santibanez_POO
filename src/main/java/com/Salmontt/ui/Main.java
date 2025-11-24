@@ -46,7 +46,7 @@ public class Main {
 
                     String opcionDos = sc.nextLine().trim();
 
-                    do{
+
                         switch (opcionDos) {
                             case "1":
                                 gestorDatos.listarTrabajadores();
@@ -54,19 +54,14 @@ public class Main {
                                 break;
 
                             case "2":
-
-                                gestorDatos.procesoBusquedaTrabajador();
+                                System.out.println("Por favor escriba el el rut que desea buscar:");
+                                String rut = sc.nextLine();
+                                gestorDatos.buscarRut(rut);
                                 break;
 
                             default:
                                 System.out.println("Opción no válida. Intente nuevamente.");
                         }
-
-                    }while(opcionDos != "1" && opcionDos !="2");
-
-
-
-
 
                     if (!bucleMenuVolver(sc)) {
                         salir = true;
